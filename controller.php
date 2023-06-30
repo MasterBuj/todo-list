@@ -1,8 +1,5 @@
 <?php
 
-if (isset($_POST['addNew']))
-  $todo->add_todo($_POST['task']);
-
 if (isset($_GET['action'])) {
   $id = $_GET['id'];
   switch ($_GET['action']) {
@@ -18,8 +15,13 @@ if (isset($_GET['action'])) {
   }
 }
 
-if (isset($_POST['updateLast'])) {
-  $task = $_POST['task'];
+
+if (isset($_POST['addNew']))
+  $todo->add_todo($_POST['task']);
+
+
+if (isset($_POST['updateTask'])) {
+  $task = $_POST['taskTitle'];
   $id = $_POST['task_id'];
 
   $todo->update_todo($id, $task);

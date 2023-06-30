@@ -21,7 +21,7 @@ include("controller.php");
     </head>
 
     <body>
-        <div class=" px-5 mt-5 md-5">
+        <div class=" px-5 mt-3 md-5">
             <h1 class="mb-5">My ToDo List</h1>
 
             <div class="row d-flex flex-md-wrap-reverse">
@@ -49,25 +49,29 @@ include("controller.php");
 
                         <div class="form-group mb-4">
                             <label for="taskDesc">Task Description</label>
-                            <textarea class="form-control text-nowrap" name="taskDesc" id="taskDesc" rows="3"
-                                placeholder="Enter task description"></textarea>
+                            <textarea class="form-control" name="taskDesc" id="taskDesc" rows="3" cols="20" wrap="hard"
+                                placeholder="Enter task description"><?= isset($_GET['description']) && $_GET['action'] == 'edit' ? $_GET['description'] : ''; ?></textarea>
                         </div>
 
-                        <div class="form-group mb-5">
-                            <label class="text-nowrap" for="file">Add file </label>
-                            <input type="file" class="form-control  text-nowrap" name="file" aria-describedby="fileHelp"
-                                id="file" />
-                            <small id="fileHelp" class="form-text text-muted">*Add file ( 5Mb file limit )</small>
+                        <div class="custom-file mb-5">
+                            <input type="file" class="custom-file-input text-nowrap" name="file"
+                                aria-describedby="fileHelp" id="file" />
+                            <label class="custom-file-label" for="file">
+                                <?= isset($_GET['attachment']) && $_GET['action'] == 'edit' ? ($_GET['attachment'] == '') ? 'Choose file (2MB max size)' : $_GET['attachment'] : 'Choose file (2MB max size)'; ?>
+                            </label>
 
                         </div>
 
                         <input type="submit" class="btn btn-primary form-control mb-3"
-                            name="<?= isset($_GET['action']) && $_GET['action'] == 'edit' ? 'updateLast' : 'addNew'; ?>"
+                            name="<?= isset($_GET['action']) && $_GET['action'] == 'edit' ? 'updateTask' : 'addNew'; ?>"
                             value="<?php echo isset($_GET['action']) && $_GET['action'] == 'edit' ? 'Save Task' : 'Add Task'; ?>"
-                            disabled />
+                            <?php echo isset($_GET['action']) && $_GET['action'] == 'edit' ? '' : ' disabled'; ?> />
                         <a class="btn border-primary form-control" href="index.php">
                             <?php echo isset($_GET['action']) && $_GET['action'] == 'edit' ? 'Cancel' : 'Clear'; ?>
                         </a>
+                        <input type="hidden" type="submit"
+                            value="<?= isset($_GET['action']) && $_GET['action'] == 'edit' ? $_GET['id'] : ''; ?>"
+                            name="task_id" />
                     </form>
                 </div>
 
@@ -87,9 +91,7 @@ include("controller.php");
 
                             <?php
                             $todo->show_todo("all");
-
                             ?>
-
 
                         </tbody>
                     </table>
@@ -100,19 +102,27 @@ include("controller.php");
 
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
             integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
-            </script>
+        </script>
 
 
         <script>
-            $(document).ready(function () {
-                $('#taskTitle').on('keyup', function () {
+        $(document).ready(function() {
+            $('#taskTitle').on('keyup', function() {
+                if ($(this).val() == "Save Task")
+                    return
 
-                    if ($(this).val().length == 0)
-                        $('form[id=addTask] > input[type=submit]').attr('disabled', 'disabled');
-                    else
-                        $('form[id=addTask] > input[type=submit]').attr('disabled', false);
-                });
+
+                if ($(this).val().length <= 5)
+                    $('form[id=addTask] > input[type=submit]').attr('disabled', 'disabled');
+                else
+                    $('form[id=addTask] > input[type=submit]').attr('disabled', false);
             });
+
+            $('input[type="file"]').change(function(e) {
+                var fileName = e.target.files[0].name;
+                $('label[for=file]').text(fileName)
+            });
+        });
         </script>
     </body>
 

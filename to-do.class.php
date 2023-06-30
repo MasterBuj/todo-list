@@ -49,8 +49,14 @@ class Todo
    */
   public function add_todo($task)
   {
-    $date = time();
-    $query = "INSERT INTO todo (todo, date, done) VALUES ('$task', '$date', '0')";
+    $todo = $_POST['taskTitle'];
+    $dateNow = time();
+    $description = $_POST['taskDesc'];
+    $attachment = $_POST['file'];
+    $isdone = '1';
+
+
+    $query = "INSERT INTO todo (todo, date, isDone, description, attachment) VALUES ('$todo', '$dateNow', '$isdone', '$description', '$attachment')";
 
     $this->run_query($query);
   }
@@ -106,11 +112,20 @@ class Todo
    * @param int $id
    * @param string $task
    */
-  public function update_todo($id, $task)
+  public function update_todo($id, $data)
   {
-    $task = $_POST['task'];
+    $todo = $_POST['taskTitle'];
+    $dateNow = time();
+    $description = $_POST['taskDesc'];
+    $attachment = $_POST['file'];
 
-    $data = ['todo' => $task];
+    $data = [
+      'todo' => $todo,
+      'date' => $dateNow,
+      'description' => $description,
+      'attachment' => $attachment,
+    ];
+
     $where = ['id' => $id];
 
     $this->update_sql_query($data, $where, $table = 'todo');
@@ -227,18 +242,20 @@ class Todo
     while ($row = mysqli_fetch_array($todos)):
       $name = ($row["isDone"] == 0) ? 'Done' : 'Not Done';
       $isDone = ($row["isDone"] == 0) ? 'bg-success' : 'bg-warning';
+      $fileType = pathinfo($row['attachment'], PATHINFO_EXTENSION);
       echo ' <tr>';
       echo '<td class="col-1">' . $num . '</td>';
-      echo ' <td> <a href="#" class="font-weight-bold">' . $row["todo"] . '</a> </td>';
-      echo '<td class="col-1">
-                  <span class="border border-success text-primary rounded-sm px-2 my-1 my-sm-0">PNG</span>
-                </td>';
+      echo ' <td> <span class="font-weight-bold text-primary">' . $row["todo"] . '</span> </td>';
+      echo '<td class="col-1">';
+      if ($fileType != '') {
+        echo '<span class="border border-success text-primary rounded-sm px-2 my-1 my-sm-0 text-uppercase">' . $fileType . '</span> </td>';
+      }
       echo '<td class="col-2"> 
                   <a href="?id=' . $row["id"] . '&action=' . $name . '" class="text-decoration-none text-nowrap"><span class="my-1 my-sm-0 px-2 py-1 text-white rounded ' . $isDone . ' text-uppercase "> ' . $name . ' </span></a>
                 </td>';
       echo '<td class="col-2">' . date('m/d/Y', $row["date"]) . '</td>';
       echo '<td class="col-1">';
-      echo ' <a href="?id=' . $row["id"] . '&action=edit&todo=' . $row["todo"] . '"  class="text-decoration-none">
+      echo ' <a href="?id=' . $row["id"] . '&action=edit&todo=' . $row["todo"] . '&description=' . $row["description"] . '&attachment=' . $row["attachment"] . '"  class="text-decoration-none">
                     <span class="fas fa-edit fa-lg mr-1 text-primary"></span>
                   </a>';
       echo ' <a href="?id=' . $row["id"] . '&action=delete" class="text-decoration-none">
